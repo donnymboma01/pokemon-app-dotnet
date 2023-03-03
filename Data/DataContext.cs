@@ -15,5 +15,31 @@ namespace PokemonReviewApp.Data
         public DbSet<Reviewer> Reviewers { get; set; }
         public DbSet<PokemonOwner> PokemonOwners { get; set; }
         public DbSet<PokemonCategory> PokemonCategories { get; set; }
+
+        // tout ca à cause de la rélation Many-to-Many
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PokemonCategory>().HasKey(pc => new { pc.PokemonId, pc.CategoryId });
+            modelBuilder.Entity<PokemonCategory>()
+                .HasOne(p => p.Pokemon)
+                .WithMany(pc => pc.PokemonCategory)
+                .HasForeignKey(c => c.CategoryId);
+
+            modelBuilder.Entity<PokemonCategory>()
+                .HasOne(p => p.Category)
+                .WithMany(pc => pc.PokemonCategories)
+                .HasForeignKey(c => c.CategoryId);
+
+            modelBuilder.Entity<PokemonOwner>().HasKey(po => new { po.PokemonId, po.OwnerId });
+            modelBuilder.Entity<PokemonOwner>()
+               .HasOne(p => p.Pokemon)
+               .WithMany(pc => pc.PokemonOwner)
+               .HasForeignKey(c => c.PokemonId);
+
+            modelBuilder.Entity<PokemonOwner>()
+                .HasOne(p => p.Owner)
+                .WithMany(pc => pc.PokemonOwners)
+                .HasForeignKey(c => c.OwnerId);
+        }
     }
 }
